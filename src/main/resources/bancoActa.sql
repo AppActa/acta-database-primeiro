@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS problema (
                                         solucao VARCHAR(200),
                                         status status_problema_enum NOT NULL DEFAULT 'Em análise',
                                         origem TEXT,
-                                        encontrado_em DATE NOT NULL DEFAULT CURRENT_DATE,
+                                        encontrado_em DATE NOT NULL,
                                         projeto_id INT NOT NULL REFERENCES projeto(projeto_id),
                                         plano_acao_id INT REFERENCES plano_acao(plano_acao_id)
 );
@@ -179,3 +179,39 @@ CREATE TABLE IF NOT EXISTS empresa_administrador_geral (
                                                            adm_geral_id INT NOT NULL REFERENCES administrador_geral (adm_geral_id),
                                                            PRIMARY KEY (empresa_id, adm_geral_id)
 );
+
+ALTER TABLE endereco
+ADD CONSTRAINT chk_cep_tamanho CHECK (length(cep)=8);
+
+ALTER TABLE telefone
+ADD CONSTRAINT chk_tamanho_telefone CHECK (length(telefone)=11);
+
+ALTER TABLE empresa
+ADD CONSTRAINT chk_cnpj_empresa CHECK (length(cnpj)=14);
+
+ALTER TABLE administrador_geral
+ADD CONSTRAINT chk_cpf_adm_geral CHECK ( length(cpf)=11);
+
+ALTER TABLE administracao_empresa
+ADD CONSTRAINT chk_cpf_adm_empresa CHECK ( length(cpf)=11);
+
+ALTER TABLE colaborador
+ADD CONSTRAINT chk_cpf_colab CHECK ( length(cpf)=11);
+
+ALTER TABLE projeto
+ADD CONSTRAINT chk_dt_inicio CHECK ( dt_inicio>=current_date);
+
+ALTER TABLE projeto
+ADD CONSTRAINT chk_dt_fim CHECK (dt_fim>=dt_inicio);
+
+ALTER TABLE meta
+ADD CONSTRAINT chk_prazo CHECK ( prazo>=current_date);
+
+ALTER TABLE plano_acao5w2h
+ADD CONSTRAINT chk_when CHECK ( plano_acao5w2h.when <= current_date);
+
+ALTER TABLE tarefa
+ADD CONSTRAINT chk_dt_entrega CHECK (dt_entrega>=current_date);
+
+ALTER TABLE tarefa
+ADD CONSTRAINT chk_dt_inicio CHECK (dt_inicio>=current_date);
