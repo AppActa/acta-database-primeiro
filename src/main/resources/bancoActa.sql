@@ -1,6 +1,7 @@
+set timezone to 'America/Sao_Paulo';
+
 -- ENUMs
-CREATE TYPE status_masculino_enum AS ENUM ('Não iniciado', 'Iniciado', 'Finalizado');
-CREATE TYPE status_feminino_enum AS ENUM ('Não iniciada', 'Iniciada', 'Finalizada');
+CREATE TYPE status_enum AS ENUM ('Não iniciado', 'Iniciado', 'Finalizado');
 CREATE TYPE status_meta_enum AS ENUM ('Abaixo do esperado', 'Regular', 'Acima do esperado');
 CREATE TYPE status_problema_enum AS ENUM ('Em análise', 'Em resolução', 'Resolvido');
 CREATE TYPE prioridade_enum AS ENUM ('Alto', 'Médio', 'Baixo');
@@ -77,8 +78,8 @@ CREATE TABLE IF NOT EXISTS projeto (
                                        etapa_atual VARCHAR(10) NOT NULL,
                                        dt_inicio DATE NOT NULL,
                                        dt_fim DATE,
-                                       status status_masculino_enum NOT NULL DEFAULT 'Não iniciado',
-                                       criado_em TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'America/Sao_Paulo')
+                                       status status_enum NOT NULL DEFAULT 'Não iniciado',
+                                       criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Meta
@@ -89,7 +90,7 @@ CREATE TABLE IF NOT EXISTS meta (
                                     objetivo VARCHAR(200),
                                     prazo DATE NOT NULL,
                                     status status_meta_enum NOT NULL DEFAULT 'Regular',
-                                    criado_em TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'America/Sao_Paulo'),
+                                    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                                     projeto_id INT NOT NULL REFERENCES projeto(projeto_id)
 );
 
@@ -98,7 +99,7 @@ CREATE TABLE IF NOT EXISTS plano_acao (
                                           plano_acao_id SERIAL PRIMARY KEY,
                                           nome VARCHAR(20) NOT NULL,
                                           descricao TEXT,
-                                          status status_masculino_enum NOT NULL DEFAULT 'Não iniciado',
+                                          status status_enum NOT NULL DEFAULT 'Não iniciado',
                                           prioridade prioridade_enum NOT NULL DEFAULT 'Médio',
                                           projeto_id INT NOT NULL REFERENCES projeto(projeto_id)
 );
@@ -123,7 +124,7 @@ CREATE TABLE IF NOT EXISTS tarefa (
                                       descricao TEXT,
                                       prioridade prioridade_enum NOT NULL DEFAULT 'Médio',
                                       dt_entrega DATE,
-                                      status status_feminino_enum NOT NULL DEFAULT 'Não iniciada',
+                                      status status_enum NOT NULL DEFAULT 'Não iniciada',
                                       dt_inicio DATE NOT NULL,
                                       colaborador_id INT NOT NULL REFERENCES colaborador(colaborador_id)
 );
