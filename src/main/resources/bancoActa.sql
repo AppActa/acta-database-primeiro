@@ -1,0 +1,181 @@
+-- ENUMs
+CREATE TYPE status_masculino_enum AS ENUM ('Não iniciado', 'Iniciado', 'Finalizado');
+CREATE TYPE status_feminino_enum AS ENUM ('Não iniciada', 'Iniciada', 'Finalizada');
+CREATE TYPE status_meta_enum AS ENUM ('Abaixo do esperado', 'Regular', 'Acima do esperado');
+CREATE TYPE status_problema_enum AS ENUM ('Em análise', 'Em resolução', 'Resolvido');
+CREATE TYPE prioridade_enum AS ENUM ('Alto', 'Médio', 'Baixo');
+
+-- Endereço
+CREATE TABLE IF NOT EXISTS endereco (
+                                        endereco_id SERIAL PRIMARY KEY,
+                                        rua VARCHAR(30) NOT NULL,
+    bairro VARCHAR(30) NOT NULL,
+    cidade VARCHAR(30) NOT NULL,
+    estado VARCHAR(30) NOT NULL,
+    cep CHAR(8) NOT NULL,
+    numero VARCHAR(10) NOT NULL,
+    complemento TEXT
+    );
+
+-- E-mail
+CREATE TABLE IF NOT EXISTS email (
+                                     email_id SERIAL PRIMARY KEY,
+                                     email VARCHAR(80) NOT NULL
+    );
+
+-- Telefone
+CREATE TABLE IF NOT EXISTS telefone (
+                                        telefone_id SERIAL PRIMARY KEY,
+                                        telefone CHAR(11) NOT NULL
+    );
+
+-- Empresa
+CREATE TABLE IF NOT EXISTS empresa (
+                                       empresa_id SERIAL PRIMARY KEY,
+                                       nome VARCHAR(30) NOT NULL,
+    setor VARCHAR(30),
+    unidade VARCHAR(30),
+    endereco_id INT CONSTRAINT fk_empresa_endereco REFERENCES endereco (endereco_id),
+    cnpj CHAR(14) NOT NULL
+    );
+
+-- Administrador Geral
+CREATE TABLE IF NOT EXISTS administrador_geral (
+                                                   adm_geral_id SERIAL PRIMARY KEY,
+                                                   nome VARCHAR(30) NOT NULL,
+    senha VARCHAR(100) NOT NULL,
+    email_id INT NOT NULL CONSTRAINT fk_adm_geral_email REFERENCES email (email_id),
+    cpf CHAR(11) NOT NULL
+    );
+
+-- Administração Empresa
+CREATE TABLE IF NOT EXISTS administracao_empresa (
+                                                     adm_empresa_id SERIAL PRIMARY KEY,
+                                                     nome VARCHAR(30) NOT NULL,
+    senha VARCHAR(100) NOT NULL,
+    email_id INT NOT NULL CONSTRAINT fk_adm_empresa_email REFERENCES email (email_id),
+    empresa_id INT NOT NULL CONSTRAINT fk_adm_empresa_empresa REFERENCES empresa (empresa_id),
+    cpf CHAR(11) NOT NULL
+    );
+
+-- Colaborador
+CREATE TABLE IF NOT EXISTS colaborador (
+                                           colaborador_id SERIAL PRIMARY KEY,
+                                           nome VARCHAR(30) NOT NULL,
+    sobrenome VARCHAR(50) NOT NULL,
+    permissao_gestor BOOLEAN NOT NULL DEFAULT FALSE,
+    cargo VARCHAR(30),
+    email_id INT NOT NULL CONSTRAINT fk_colaborador_email REFERENCES email (email_id),
+    telefone_id INT CONSTRAINT fk_colaborador_telefone REFERENCES telefone (telefone_id),
+    cpf CHAR(11) NOT NULL
+    );
+
+-- Projeto
+CREATE TABLE IF NOT EXISTS projeto (
+                                       projeto_id SERIAL PRIMARY KEY,
+                                       nome VARCHAR(30) NOT NULL,
+    etapa_atual VARCHAR(10),
+    dt_inicio DATE NOT NULL,
+    dt_fim DATE,
+    status status_masculino_enum NOT NULL DEFAULT 'Não iniciado',
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'America/Sao_Paulo')
+    );
+
+-- Meta
+CREATE TABLE IF NOT EXISTS meta (
+                                    meta_id SERIAL PRIMARY KEY,
+                                    meta VARCHAR(100) NOT NULL,
+    descricao_meta TEXT,
+    objetivo VARCHAR(200),
+    prazo DATE NOT NULL,
+    status status_meta_enum NOT NULL DEFAULT 'Regular',
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'America/Sao_Paulo'),
+    projeto_id INT NOT NULL CONSTRAINT fk_meta_projeto REFERENCES projeto (projeto_id)
+    );
+
+-- Plano de Ação
+CREATE TABLE IF NOT EXISTS plano_acao (
+                                          plano_acao_id SERIAL PRIMARY KEY,
+                                          nome VARCHAR(20) NOT NULL,
+    descricao TEXT,
+    status status_masculino_enum NOT NULL DEFAULT 'Não iniciado',
+    prioridade prioridade_enum NOT NULL DEFAULT 'Médio',
+    projeto_id INT NOT NULL CONSTRAINT fk_plano_acao_projeto REFERENCES projeto (projeto_id)
+    );
+
+-- 5W2H
+CREATE TABLE IF NOT EXISTS plano_acao5w2h (
+                                              plano_acao_5w2h_id SERIAL PRIMARY KEY,
+                                              what VARCHAR(50) NOT NULL,
+    why VARCHAR(50),
+    where VARCHAR(50),
+    when DATE,
+    who VARCHAR(50),
+    how VARCHAR(50),
+    how_much VARCHAR(50),
+    plano_acao_id INT NOT NULL CONSTRAINT fk_5w2h_plano_acao REFERENCES plano_acao (plano_acao_id)
+    );
+
+-- Tarefa
+CREATE TABLE IF NOT EXISTS tarefa (
+                                      tarefa_id SERIAL PRIMARY KEY,
+                                      titulo VARCHAR(20) NOT NULL,
+    descricao TEXT,
+    prioridade prioridade_enum NOT NULL DEFAULT 'Médio',
+    dt_entrega DATE,
+    status status_feminino_enum NOT NULL DEFAULT 'Não iniciada',
+    dt_inicio DATE NOT NULL,
+    colaborador_id INT CONSTRAINT fk_tarefa_colaborador REFERENCES colaborador (colaborador_id)
+    );
+
+-- Lições Aprendidas
+CREATE TABLE IF NOT EXISTS licoes_aprendidas (
+                                                 licao_id SERIAL PRIMARY KEY,
+                                                 titulo VARCHAR(50) NOT NULL,
+    area VARCHAR(30),
+    aprendizado TEXT NOT NULL,
+    categoria VARCHAR(30),
+    descricao TEXT,
+    fase_origem VARCHAR(8),
+    severidade VARCHAR(50),
+    colaborador_id INT CONSTRAINT fk_licoes_colaborador REFERENCES colaborador (colaborador_id)
+    );
+
+-- Problema
+CREATE TABLE IF NOT EXISTS problema (
+                                        problema_id SERIAL PRIMARY KEY,
+                                        titulo VARCHAR(100) NOT NULL,
+    descricao TEXT NOT NULL,
+    solucao VARCHAR(200),
+    status status_problema_enum NOT NULL DEFAULT 'Em análise',
+    origem TEXT,
+    encontrado_em DATE NOT NULL DEFAULT CURRENT_DATE,
+    projeto_id INT NOT NULL CONSTRAINT fk_problema_projeto REFERENCES projeto (projeto_id),
+    plano_acao_id INT CONSTRAINT fk_problema_plano_acao REFERENCES plano_acao (plano_acao_id)
+    );
+
+-- Relacionamentos N:N
+
+CREATE TABLE IF NOT EXISTS projeto_colaborador (
+                                                   projeto_id INT NOT NULL CONSTRAINT fk_pc_projeto REFERENCES projeto (projeto_id),
+    colaborador_id INT NOT NULL CONSTRAINT fk_pc_colaborador REFERENCES colaborador (colaborador_id),
+    PRIMARY KEY (projeto_id, colaborador_id)
+    );
+
+CREATE TABLE IF NOT EXISTS projeto_plano_acao (
+                                                  projeto_id INT NOT NULL CONSTRAINT fk_ppa_projeto REFERENCES projeto (projeto_id),
+    plano_acao_id INT NOT NULL CONSTRAINT fk_ppa_plano_acao REFERENCES plano_acao (plano_acao_id),
+    PRIMARY KEY (projeto_id, plano_acao_id)
+    );
+
+CREATE TABLE IF NOT EXISTS tarefa_plano_acao (
+                                                 tarefa_id INT NOT NULL CONSTRAINT fk_tpa_tarefa REFERENCES tarefa (tarefa_id),
+    plano_acao_id INT NOT NULL CONSTRAINT fk_tpa_plano_acao REFERENCES plano_acao (plano_acao_id),
+    PRIMARY KEY (tarefa_id, plano_acao_id)
+    );
+
+CREATE TABLE IF NOT EXISTS empresa_administrador_geral (
+                                                           empresa_id INT NOT NULL CONSTRAINT fk_eag_empresa REFERENCES empresa (empresa_id),
+    adm_geral_id INT NOT NULL CONSTRAINT fk_eag_adm_geral REFERENCES administrador_geral (adm_geral_id),
+    PRIMARY KEY (empresa_id, adm_geral_id)
+    );
