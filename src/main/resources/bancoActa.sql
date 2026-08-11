@@ -48,15 +48,6 @@ CREATE TABLE IF NOT EXISTS administrador_geral (
                                                    email_id INT NOT NULL REFERENCES email (email_id)
 );
 
--- Administração Empresa
-CREATE TABLE IF NOT EXISTS administracao_empresa (
-                                                     adm_empresa_id SERIAL PRIMARY KEY,
-                                                     nome VARCHAR(30) NOT NULL,
-                                                     senha VARCHAR(100) NOT NULL,
-                                                     email_id INT NOT NULL REFERENCES email(email_id),
-                                                     empresa_id INT NOT NULL REFERENCES empresa(empresa_id),
-                                                     cpf CHAR(11) UNIQUE NOT NULL
-);
 
 -- Colaborador
 CREATE TABLE IF NOT EXISTS colaborador (
@@ -188,9 +179,6 @@ ADD CONSTRAINT chk_tamanho_telefone CHECK (length(telefone)=11);
 
 ALTER TABLE empresa
 ADD CONSTRAINT chk_cnpj_empresa CHECK (length(cnpj)=14);
-
-ALTER TABLE administracao_empresa
-ADD CONSTRAINT chk_cpf_adm_empresa CHECK ( length(cpf)=11);
 
 ALTER TABLE colaborador
 ADD CONSTRAINT chk_cpf_colab CHECK ( length(cpf)=11);
