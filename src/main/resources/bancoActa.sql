@@ -18,18 +18,6 @@ CREATE TABLE IF NOT EXISTS endereco (
                                         complemento TEXT
 );
 
--- E-mail
-CREATE TABLE IF NOT EXISTS email (
-                                     email_id SERIAL PRIMARY KEY,
-                                     email VARCHAR(80) UNIQUE NOT NULL
-);
-
--- Telefone
-CREATE TABLE IF NOT EXISTS telefone (
-                                        telefone_id SERIAL PRIMARY KEY,
-                                        telefone CHAR(11) NOT NULL
-);
-
 -- Empresa
 CREATE TABLE IF NOT EXISTS empresa (
                                        empresa_id SERIAL PRIMARY KEY,
@@ -45,7 +33,8 @@ CREATE TABLE IF NOT EXISTS administrador_geral (
                                                    adm_geral_id SERIAL PRIMARY KEY,
                                                    nome VARCHAR(30) NOT NULL,
                                                    senha VARCHAR(100) NOT NULL,
-                                                   email_id INT NOT NULL REFERENCES email (email_id)
+                                                   email VARCHAR(80) UNIQUE NOT NULL,
+                                                   telefone CHAR(11) NOT NULL
 );
 
 
@@ -56,8 +45,8 @@ CREATE TABLE IF NOT EXISTS colaborador (
                                            sobrenome VARCHAR(50) NOT NULL,
                                            permissao_gestor BOOLEAN NOT NULL DEFAULT FALSE,
                                            cargo VARCHAR(30) NOT NULL,
-                                           email_id INT NOT NULL REFERENCES email(email_id),
-                                           telefone_id INT NOT NULL REFERENCES telefone(telefone_id),
+                                           email VARCHAR(80) UNIQUE NOT NULL,
+                                           telefone CHAR(11) NOT NULL,
                                            cpf CHAR(11) UNIQUE NOT NULL
 );
 
@@ -174,14 +163,17 @@ CREATE TABLE IF NOT EXISTS empresa_administrador_geral (
 ALTER TABLE endereco
 ADD CONSTRAINT chk_cep_tamanho CHECK (length(cep)=8);
 
-ALTER TABLE telefone
-ADD CONSTRAINT chk_tamanho_telefone CHECK (length(telefone)=11);
+ALTER TABLE administrador_geral
+ADD CONSTRAINT chk_tamanho_telefone_adm CHECK (length(telefone)=11);
 
 ALTER TABLE empresa
 ADD CONSTRAINT chk_cnpj_empresa CHECK (length(cnpj)=14);
 
 ALTER TABLE colaborador
 ADD CONSTRAINT chk_cpf_colab CHECK ( length(cpf)=11);
+
+ALTER TABLE colaborador
+ADD CONSTRAINT chk_tamanho_telefone_colab CHECK (length(telefone)=11);
 
 ALTER TABLE ciclo
 ADD CONSTRAINT chk_dt_inicio CHECK ( dt_inicio>=current_date);
