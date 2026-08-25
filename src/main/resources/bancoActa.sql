@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS colaborador (
                                            email VARCHAR(80) UNIQUE NOT NULL,
                                            telefone CHAR(11) NOT NULL,
                                            cpf CHAR(11) UNIQUE NOT NULL,
-                                           empresa_id INT NOT NULL REFERENCES empresa(endereco_id)
+                                           empresa_id INT NOT NULL REFERENCES empresa(empresa_id)
 );
 
 -- Projeto
