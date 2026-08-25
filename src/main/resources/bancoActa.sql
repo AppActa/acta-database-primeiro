@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS problema (
                                         titulo VARCHAR(100) NOT NULL,
                                         descricao TEXT NOT NULL,
                                         solucao VARCHAR(200),
-                                        status status_problema_enum NOT NULL DEFAULT 'Em análise',
+                                        status status_problema_enum NOT NULL DEFAULT 'EM_ANALISE',
                                         origem TEXT,
                                         encontrado_em DATE NOT NULL,
                                         ciclo_id INT NOT NULL REFERENCES ciclo(ciclo_id),
