@@ -89,8 +89,8 @@ CREATE TABLE IF NOT EXISTS plano_acao5w2h (
                                               plano_acao_5w2h_id SERIAL PRIMARY KEY,
                                               what VARCHAR(50) NOT NULL,
                                               why VARCHAR(50),
-                                              where VARCHAR(50),
-                                              when DATE,
+                                              "where" VARCHAR(50),
+                                              "when" DATE,
                                               who VARCHAR(50),
                                               how VARCHAR(50),
                                               how_much VARCHAR(50),
@@ -143,18 +143,6 @@ CREATE TABLE IF NOT EXISTS ciclo_colaborador (
                                                    PRIMARY KEY (ciclo_id, colaborador_id)
 );
 
-CREATE TABLE IF NOT EXISTS ciclo_plano_acao (
-                                                  ciclo_id INT NOT NULL REFERENCES ciclo (ciclo_id),
-                                                  plano_acao_id INT NOT NULL REFERENCES plano_acao (plano_acao_id),
-                                                  PRIMARY KEY (ciclo_id, plano_acao_id)
-);
-
-CREATE TABLE IF NOT EXISTS tarefa_plano_acao (
-                                                 tarefa_id INT NOT NULL REFERENCES tarefa (tarefa_id),
-                                                 plano_acao_id INT NOT NULL REFERENCES plano_acao (plano_acao_id),
-                                                 PRIMARY KEY (tarefa_id, plano_acao_id)
-);
-
 CREATE TABLE IF NOT EXISTS empresa_administrador_geral (
                                                            empresa_id INT NOT NULL REFERENCES empresa (empresa_id),
                                                            adm_geral_id INT NOT NULL REFERENCES administrador_geral (adm_geral_id),
@@ -186,7 +174,7 @@ ALTER TABLE meta
 ADD CONSTRAINT chk_prazo CHECK ( prazo>=current_date);
 
 ALTER TABLE plano_acao5w2h
-ADD CONSTRAINT chk_when CHECK ( plano_acao5w2h.when <= current_date);
+ADD CONSTRAINT chk_when CHECK ( "when" <= current_date);
 
 ALTER TABLE tarefa
 ADD CONSTRAINT chk_dt_entrega CHECK (dt_entrega>=current_date);
