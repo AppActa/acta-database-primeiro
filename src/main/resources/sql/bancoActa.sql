@@ -181,3 +181,12 @@ ADD CONSTRAINT chk_dt_entrega CHECK (dt_entrega>=current_date);
 
 ALTER TABLE tarefa
 ADD CONSTRAINT chk_dt_inicio CHECK (dt_inicio>=current_date);
+
+ALTER TABLE colaborador
+ALTER COLUMN cargo TYPE VARCHAR(100);
+
+ALTER TABLE ciclo
+ALTER COLUMN nome TYPE VARCHAR(60);
+
+ALTER TABLE tarefa
+ALTER COLUMN titulo TYPE VARCHAR(50);
