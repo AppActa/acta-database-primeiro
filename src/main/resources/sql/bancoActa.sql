@@ -1,4 +1,27 @@
+-- BANCO DE DADOS ACTA
 set timezone to 'America/Sao_Paulo';
+
+DROP TABLE IF EXISTS
+    endereco,
+    empresa,
+    administrador_geral,
+    colaborador,
+    ciclo,
+    meta,
+    plano_acao,
+    plano_acao5w2h,
+    tarefa,
+    licoes_aprendidas,
+    problema,
+    ciclo_colaborador,
+    empresa_administrador_geral;
+
+DROP TYPE IF EXISTS
+    status_enum,
+    status_meta_enum,
+    status_problema_enum,
+    prioridade_enum,
+    etapas_ciclo_enum;
 
 -- ENUMs
 CREATE TYPE status_enum AS ENUM ('NAO_INICIADO', 'INICIADO', 'FINALIZADO');
@@ -6,6 +29,16 @@ CREATE TYPE status_meta_enum AS ENUM ('ABAIXO_DO_ESPERADO', 'REGULAR', 'ACIMA_DO
 CREATE TYPE status_problema_enum AS ENUM ('EM_ANALISE', 'EM_RESOLUCAO', 'RESOLVIDO');
 CREATE TYPE prioridade_enum AS ENUM ('ALTO', 'MEDIO', 'BAIXO');
 CREATE TYPE etapas_ciclo_enum AS ENUM ('PLAN', 'DO', 'CHECK', 'ACT');
+
+-- Empresa
+CREATE TABLE IF NOT EXISTS empresa (
+                                       empresa_id SERIAL PRIMARY KEY,
+                                       nome VARCHAR(30) NOT NULL,
+                                       setor VARCHAR(30) NOT NULL,
+                                       unidade VARCHAR(30) NOT NULL,
+                                       cnpj CHAR(14) UNIQUE NOT NULL
+);
+
 -- Endereço
 CREATE TABLE IF NOT EXISTS endereco (
                                         endereco_id SERIAL PRIMARY KEY,
@@ -15,17 +48,8 @@ CREATE TABLE IF NOT EXISTS endereco (
                                         estado VARCHAR(30) NOT NULL,
                                         cep CHAR(8) NOT NULL,
                                         numero VARCHAR(10) NOT NULL,
-                                        complemento TEXT
-);
-
--- Empresa
-CREATE TABLE IF NOT EXISTS empresa (
-                                       empresa_id SERIAL PRIMARY KEY,
-                                       nome VARCHAR(30) NOT NULL,
-                                       setor VARCHAR(30) NOT NULL,
-                                       unidade VARCHAR(30) NOT NULL,
-                                       endereco_id INT REFERENCES endereco(endereco_id),
-                                       cnpj CHAR(14) UNIQUE NOT NULL
+                                        complemento TEXT,
+                                        empresa_id INT REFERENCES empresa(empresa_id)
 );
 
 -- Administrador Geral
@@ -59,7 +83,8 @@ CREATE TABLE IF NOT EXISTS ciclo (
                                        dt_inicio DATE NOT NULL,
                                        dt_fim DATE,
                                        status status_enum NOT NULL DEFAULT 'NAO_INICIADO',
-                                       criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                                       criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                                       empresa_id INT REFERENCES empresa(empresa_id)
 );
 
 -- Meta
@@ -190,3 +215,6 @@ ALTER COLUMN nome TYPE VARCHAR(60);
 
 ALTER TABLE tarefa
 ALTER COLUMN titulo TYPE VARCHAR(50);
+
+ALTER TABLE plano_acao
+ALTER COLUMN nome TYPE VARCHAR(50);
