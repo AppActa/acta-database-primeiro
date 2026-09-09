@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS colaborador (
     cargo VARCHAR(50) NOT NULL,
     dt_contratacao DATE NOT NULL CHECK (dt_contratacao<=current_date),
     email VARCHAR(80) UNIQUE NOT NULL,
+    senha VARCHAR(100) UNIQUE NOT NULL,
     telefone CHAR(11) NOT NULL,
     cpf CHAR(11) UNIQUE NOT NULL,
     empresa_id INT NOT NULL REFERENCES empresa(empresa_id)
